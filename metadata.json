@@ -1,0 +1,5 @@
+{
+  "name": "AI Face Swap Studio",
+  "description": "A user-friendly application to realistically swap a user's face into a reference image using advanced AI. Upload a reference photo, provide your own photo, and let the AI create a seamless new image.",
+  "requestFramePermissions": []
+}
