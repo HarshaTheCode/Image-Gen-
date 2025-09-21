@@ -87,34 +87,20 @@ export async function generateImage(referenceImage: ImageState, userImage: Image
         };
 
         const textPart = {
-            text: `**SYSTEM PROMPT: AI PORTRAIT ARTIST**
+            text: `Your task is to create a new, single, photorealistic portrait.
 
-**ROLE:** You are an AI digital artist. Your task is to generate a new, photorealistic portrait based on a user's photo and a highly detailed creative brief.
+**Subject:** The subject is the person in the provided user image. You must create an unmistakable, high-fidelity likeness of this person, preserving all their key facial features. Integrate them seamlessly into the new scene. Do not create a 'cut-and-paste' look.
 
-**OBJECTIVE:** Generate a *new*, single, photorealistic portrait that features the person from the **User Image** as the subject, but rendered in the exact style and **pose** described by the **Creative Brief**.
+**Instructions:** The new portrait's entire visual aesthetic—style, mood, lighting, composition, and color—is defined by the following creative brief. Follow it exactly.
 
-**INPUTS:**
-1.  **User Image:** This image provides the person's identity. The final image MUST be an unmistakable likeness of this person. Preserve all key facial features.
-2.  **Creative Brief:** This is the detailed text prompt that describes the *entire* visual aesthetic of the final image. You must follow these instructions with extreme precision.
-
-**CREATIVE BRIEF:**
----
+**Creative Brief:**
 ${detailedPrompt}
----
 
-**CORE DIRECTIVES (NON-NEGOTIABLE):**
-1.  **INTEGRATE THE SUBJECT:** The person from the User Image must be the subject of the new portrait. Render their entire head and face naturally within the scene described by the Creative Brief. The integration must be seamless and photorealistic.
-2.  **POSE REPLICATION (CRITICAL):** The subject's pose—including head tilt, shoulder angle, and gaze direction—MUST precisely match the description in the Creative Brief. This is a primary objective. Replicating the pose accurately is more important than replicating the clothing or background details if a choice must be made.
-3.  **IDENTITY PRESERVATION:** The generated face must be a high-fidelity likeness of the user.
-4.  **ADHERE TO THE BRIEF:** The final image's overall style, mood, lighting, composition, and all other visual elements must strictly follow the Creative Brief.
-5.  **OUTPUT SPECIFICATIONS:**
-    *   **Aspect Ratio:** The final image MUST be generated with a **${aspectRatio}** aspect ratio.
-    *   **No Artifacts:** The output must be free of any digital artifacts, blurring, noise, watermarks, text, or signatures. It should be sharp, clear, and high-quality.
+**Critical Requirement - Pose:** The subject's pose in the new portrait (head tilt, shoulder angle, gaze) MUST precisely match the pose described in the Creative Brief. This is the most important instruction.
 
-**STRICT PROHIBITIONS:**
-*   **DO NOT** create a 'cut-and-paste' or collage effect. The user's face must be an integral part of a newly generated, unified scene.
-*   **DO NOT** deviate from the instructions in the Creative Brief, especially the pose.
-*   **DO NOT** generate distorted or unrealistic anatomy.`,
+**Output Format:**
+- The image must have a ${aspectRatio} aspect ratio.
+- The image must be high-quality, sharp, clear, and free of any watermarks, text, or artifacts.`,
         };
         
         const response = await ai.models.generateContent({
@@ -143,7 +129,13 @@ ${detailedPrompt}
     } catch (error) {
         console.error("Error during the two-step image generation process:", error);
         if (error instanceof Error) {
-            throw new Error(`Gemini API Error: ${error.message}`);
+            // The error message from the SDK might be a JSON string, so we'll try to parse it for cleaner logging.
+            try {
+                const parsedError = JSON.parse(error.message);
+                throw new Error(`Gemini API Error: ${parsedError.error?.message || error.message}`);
+            } catch (e) {
+                throw new Error(`Gemini API Error: ${error.message}`);
+            }
         }
         throw new Error("An unknown error occurred while communicating with the Gemini API.");
     }
