@@ -1,5 +1,5 @@
 import { GoogleGenAI, Modality, GenerateContentResponse } from "@google/genai";
-import { ImageState, AspectRatio } from '../types';
+import { ImageState, AspectRatio } from '../types.ts';
 
 // The GoogleGenAI instance is initialized here.
 // Per instructions, the API key is sourced from process.env.API_KEY.

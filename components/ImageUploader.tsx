@@ -1,6 +1,5 @@
-
 import React, { useState, useCallback, useRef } from 'react';
-import { UploadIcon, CheckCircleIcon } from './Icons';
+import { UploadIcon, CheckCircleIcon } from './Icons.tsx';
 
 interface ImageUploaderProps {
   title: string;

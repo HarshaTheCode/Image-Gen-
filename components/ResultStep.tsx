@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ImageState } from '../types';
-import { DownloadIcon, RefreshIcon } from './Icons';
+import { ImageState } from '../types.ts';
+import { DownloadIcon, RefreshIcon } from './Icons.tsx';
 
 interface ResultStepProps {
   referenceImage: ImageState | null;

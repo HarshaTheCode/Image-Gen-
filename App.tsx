@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { AppStep, ImageState, AspectRatio } from './types';
-import UploadStep from './components/UploadStep';
-import ProcessingStep from './components/ProcessingStep';
-import ResultStep from './components/ResultStep';
-import Header from './components/Header';
-import { generateImage } from './services/geminiService';
+import { AppStep, ImageState, AspectRatio } from './types.ts';
+import UploadStep from './components/UploadStep.tsx';
+import ProcessingStep from './components/ProcessingStep.tsx';
+import ResultStep from './components/ResultStep.tsx';
+import Header from './components/Header.tsx';
+import { generateImage } from './services/geminiService.ts';
 
 const App: React.FC = () => {
   const [step, setStep] = useState<AppStep>(AppStep.UPLOAD);

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { ImageState, AspectRatio } from '../types';
-import ImageUploader from './ImageUploader';
-import { fileToBase64 } from '../utils/fileUtils';
-import { CheckIcon, WarningIcon, PortraitIcon, SquareIcon, LandscapeIcon } from './Icons';
+import { ImageState, AspectRatio } from '../types.ts';
+import ImageUploader from './ImageUploader.tsx';
+import { fileToBase64 } from '../utils/fileUtils.ts';
+import { CheckIcon, WarningIcon, PortraitIcon, SquareIcon, LandscapeIcon } from './Icons.tsx';
 
 interface UploadStepProps {
   onStartGeneration: (referenceImage: ImageState, userImage: ImageState, aspectRatio: AspectRatio) => void;
