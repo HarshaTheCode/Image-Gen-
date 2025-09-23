@@ -1,11 +1,11 @@
-import { GoogleGenAI, Modality } from "@google/genai";
+import { GoogleGenAI, Modality, GenerateContentResponse } from "@google/genai";
 import { ImageState, AspectRatio } from '../types';
 
-if (!process.env.API_KEY) {
-    console.error("API_KEY environment variable not set.");
-}
-
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+// The GoogleGenAI instance is initialized here.
+// Per instructions, the API key is sourced from process.env.API_KEY.
+// If the API key is missing or invalid, the SDK will throw an error when an API call is made.
+// This error is caught in App.tsx, preventing a blank screen and showing a user-friendly message.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 /**
  * Step 1: Analyze the reference image and generate a detailed text prompt that
@@ -53,15 +53,15 @@ async function generatePromptFromReferenceImage(referenceImage: ImageState): Pro
 Now, analyze the user's image and generate the prompt.`
     };
 
-    const response = await ai.models.generateContent({
-        model: model,
+    const response: GenerateContentResponse = await ai.models.generateContent({
+        model,
         contents: { parts: [referenceImagePart, textPart] },
         config: {
             temperature: 0.2,
         },
     });
 
-    return response.text.trim();
+    return response.text;
 }
 
 
@@ -103,7 +103,7 @@ ${detailedPrompt}
 - The image must be high-quality, sharp, clear, and free of any watermarks, text, or artifacts.`,
         };
         
-        const response = await ai.models.generateContent({
+        const response: GenerateContentResponse = await ai.models.generateContent({
             model: model,
             contents: {
                 parts: [userImagePart, textPart],
@@ -113,29 +113,23 @@ ${detailedPrompt}
             },
         });
         
-        for (const part of response.candidates?.[0]?.content?.parts || []) {
-            if (part.inlineData && part.inlineData.data) {
+        for (const part of response.candidates[0].content.parts) {
+            if (part.inlineData?.data) {
                 return part.inlineData.data;
             }
         }
         
-        console.warn("Gemini API did not return an image part in the final step.", response);
-        const textResponse = response.text?.trim();
+        const textResponse = response.text;
         if (textResponse) {
              throw new Error(`The AI failed to generate an image. Reason: ${textResponse}`);
         }
-        return null;
+        
+        throw new Error('The AI model did not return an image. Please try again with different images.');
 
     } catch (error) {
-        console.error("Error during the two-step image generation process:", error);
+        console.error("Error during image generation process:", error);
         if (error instanceof Error) {
-            // The error message from the SDK might be a JSON string, so we'll try to parse it for cleaner logging.
-            try {
-                const parsedError = JSON.parse(error.message);
-                throw new Error(`Gemini API Error: ${parsedError.error?.message || error.message}`);
-            } catch (e) {
-                throw new Error(`Gemini API Error: ${error.message}`);
-            }
+            throw new Error(error.message);
         }
         throw new Error("An unknown error occurred while communicating with the Gemini API.");
     }
