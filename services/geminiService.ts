@@ -1,17 +1,11 @@
 import { GoogleGenAI, Modality, GenerateContentResponse } from "@google/genai";
 import { ImageState, AspectRatio } from '../types.ts';
 
-// The GoogleGenAI instance is initialized here.
-// Per instructions, the API key is sourced from process.env.API_KEY.
-// If the API key is missing or invalid, the SDK will throw an error when an API call is made.
-// This error is caught in App.tsx, preventing a blank screen and showing a user-friendly message.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 /**
  * Step 1: Analyze the reference image and generate a detailed text prompt that
  * captures its style, lighting, composition, and mood.
  */
-async function generatePromptFromReferenceImage(referenceImage: ImageState): Promise<string> {
+async function generatePromptFromReferenceImage(ai: GoogleGenAI, referenceImage: ImageState): Promise<string> {
     const model = 'gemini-2.5-flash';
 
     const referenceImagePart = {
@@ -69,10 +63,16 @@ Now, analyze the user's image and generate the prompt.`
  * Orchestrates the full two-step image generation process.
  */
 export async function generateImage(referenceImage: ImageState, userImage: ImageState, aspectRatio: AspectRatio): Promise<string | null> {
+    if (!process.env.API_KEY) {
+      throw new Error("API_KEY is not configured. Please set the API_KEY environment variable in your deployment settings.");
+    }
+
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
     try {
         // Step 1: Generate a detailed prompt from the reference image.
         console.log("Step 1: Generating detailed prompt from reference image...");
-        const detailedPrompt = await generatePromptFromReferenceImage(referenceImage);
+        const detailedPrompt = await generatePromptFromReferenceImage(ai, referenceImage);
         console.log("Generated Prompt:", detailedPrompt);
 
         // Step 2: Use the generated prompt and user image to create the final portrait.
